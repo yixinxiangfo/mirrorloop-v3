@@ -77,6 +77,8 @@ app.post('/webhook',async(req,res) => { //①開始
 
     for(const event of events){            //③開始
       if(event.type === 'message' && event.message.type === 'text'){     //④開始
+        const userId = event.source.userId;   // ← 追加
+        console.log('USER_ID:', userId);   // ← 追加
         const userMessage = event.message.text;
         const replyToken = event.replyToken;
         console.log('Received:', userMessage) 
