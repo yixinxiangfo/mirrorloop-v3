@@ -1,4 +1,13 @@
 //MIRRORLOOP V3 index.js
+//PostgreSQL接続
+const { Pool } = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl:{
+    rejectUnauthorized: false
+  }
+});
+
 const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto');
@@ -77,8 +86,6 @@ app.post('/webhook',async(req,res) => { //①開始
 
     for(const event of events){            //③開始
       if(event.type === 'message' && event.message.type === 'text'){     //④開始
-        const userId = event.source.userId;   // ← 追加
-        console.log('USER_ID:', userId);   // ← 追加
         const userMessage = event.message.text;
         const replyToken = event.replyToken;
         console.log('Received:', userMessage) 
