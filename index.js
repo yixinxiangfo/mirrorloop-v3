@@ -40,6 +40,24 @@ function decrypt(encryptedText){
   return decrypted;
 }
 
+//固有名詞検出
+function containsProperNoun(text){
+  //カタカナ人名パターン（例：タナカ、ヤマダ）
+  const katakanaPattern = /[ア-ン]{2,}(さん|くん|氏|部長|課長|社長)?/;
+  //感じ人名パターン（例：田中、山田）
+  const kanjiPattern = /(さん|くん|氏|部長|課長|社長|先輩|後輩)/;
+  return katakanaPattern.test(text)||kanjiPattern.test(text);
+}
+
+//仏教警告文
+function getBuddhistWarning(){
+  return `固有名詞が含まれています。
+仏教では全行為として「不害」を説きます。
+他者を傷つける言葉は、
+自らの阿頼耶識に刻まれます。
+言葉を変えて入力してください。`;
+}
+
 const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto');
