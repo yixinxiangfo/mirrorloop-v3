@@ -200,5 +200,21 @@ app.listen(PORT,()=>{  //⑤開始
   console.log('沈黙する鏡、始動');
 });  //⑤終了
 
+//PostgreSQLにデータベースを作る
+async function createTableIfNotExists(){
+  try{
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS complaints(
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(255),
+        encrypted_text TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✅ complaints table ready');
+ } catch(error){
+    console.error('❌ Table creation error:',error);
+ }
+}
 
-
+createTableIfNotExists();
