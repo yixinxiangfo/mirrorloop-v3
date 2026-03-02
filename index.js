@@ -297,7 +297,7 @@ app.listen(PORT,()=>{
 async function createUserStatesTableIfNotExists(){
   try{
     await pool.query(`
-      CREATE TABLE IF NOT EXISIS user_states(
+      CREATE TABLE IF NOT EXISTS user_states(
        user_id VARCHAR(255) PRIMARY KEY,
        current_mode VARCHAR(50),
        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
