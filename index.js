@@ -43,7 +43,7 @@ function decrypt(encryptedText){
 function containsProperNoun(text){
   //カタカナ人名パターン（例:タナカ、ヤマダ）
   const katakanaPattern = /[ア-ン]{2,}(さん|くん|氏|部長|課長|社長)?/;
-  //感じ人名パターン（例:田中、山田）
+  //漢字人名パターン（例:田中、山田）
   const kanjiPattern = /(さん|くん|氏|部長|課長|社長|先輩|後輩)/;
   return katakanaPattern.test(text)||kanjiPattern.test(text);
 }
@@ -51,25 +51,27 @@ function containsProperNoun(text){
 //仏教警告文
 function getBuddhistWarning(){
   return `固有名詞が含まれています。
-仏教では全行為として「不害」を説きます。
+仏教では善行為として「不害」を説きます。
 他者を傷つける言葉は、
 自らの阿頼耶識に刻まれます。
 言葉を変えて入力してください。`;
 }
 
-const express = require('express');
-const axios = require('axios');
-const crypto = require('crypto');
-const app = express();
-app.use(express.json());
-const PORT = process.env.PORT || 3000;
+// ライブラリ読み込み + サーバー設定
+const express = require('express'); // Webサーバー
+const axios = require('axios');     // HTTP通信（LINE/Claude API）
+const crypto = require('crypto');   // 暗号化
+const app = express();              // サーバー作成
+app.use(express.json());            // JSON処理
+const PORT = process.env.PORT || 3000;  // ポート番号
 
 //欠如の設計プロンプト
 const SYSTEM_PROMPT = `
 # MIRRORLOOPシステムプロンプト
 
-あなたはMIRRORLOOPです。
+あなたはMirrorLoopです。
 唯識思想に基づく鏡であり、在家加行のための対話システムです。
+分析はしますが、答えは与えません。
 
 ## 核心原則
 
@@ -102,9 +104,9 @@ const SYSTEM_PROMPT = `
 ## 唯識51心所(内部参照)
 遍行:触、作意、受、想、思
 別境:欲、勝解、念、定、慧
-善:信、慚、愧、無貪、無瞋、無痴、精進、軽安、不放逸、行捨、不害
+善:信、慚、愧、無貪、無瞋、無痴、勤、安、不放逸、行捨、不害
 煩悩:貪、瞋、痴、慢、疑、悪見
-随煩悩:忿、恨、悩、覆、誑、諂、憍、害、嫉、慳、無慚、無愧、不信、懈怠、放逸、昏沈、掉挙、失念、不正知、散乱
+随煩悩:忿、恨、覆、悩、嫉、慳、誑、諂、害、憍、無慚、無愧、掉挙、昏沈、不信、懈怠、放逸、失念、散乱、不正知
 
 あなたは鏡です。
 心を映し、良き縁を映します。
@@ -285,10 +287,29 @@ app.post('/webhook',async(req,res) => {
   } 
 });
 
+//サーバー起動
 app.listen(PORT,()=>{
   console.log(`MIRRORLOOP V3 running on port ${PORT}`);
   console.log('沈黙する鏡、始動');
 });
+
+//ユーザーの現在のモードを管理するテーブルを作る
+async function createUserStatesTableIfNotExists(){
+  try{
+    await pool.query(`
+      CREATE TABLE IF NOT EXISIS user_states(
+       user_id VARCHAR(255) PRIMARY KEY,
+       current_mode VARCHAR(50),
+       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+       )
+    `);
+    console.log('✅ user_states table ready');
+  } catch(error){
+    console.error('❌ user_states table error:',error);
+  }
+}
+
+createUserStatesTableIfNotExists();
 
 //PostgreSQLにデータベースを作る
 async function createTableIfNotExists(){
